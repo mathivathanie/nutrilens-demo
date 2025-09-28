@@ -1,21 +1,45 @@
-<script>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NutriLens Prototype</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f8f8f8; }
+    video { width: 90%; max-width: 400px; margin-top: 20px; border-radius: 12px; }
+    #result { margin-top: 20px; font-size: 18px; font-weight: bold; }
+    button { padding: 10px 20px; margin-top: 15px; font-size: 16px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>🍽 NutriLens</h1>
+  <video id="video" autoplay></video><br>
+  <button onclick="startScan()">Start Scan</button>
+  <div id="result"></div>
+
+  <script>
   const video = document.getElementById('video');
   const result = document.getElementById('result');
 
-  // Try to open back camera
-  navigator.mediaDevices.getUserMedia({
-    video: { facingMode: "environment" }
-  })
-  .then(stream => {
-    video.srcObject = stream;
-  })
-  .catch(err => {
-    console.warn("Back camera failed, using front:", err);
-    // fallback to front camera
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => { video.srcObject = stream; })
-      .catch(error => alert("Camera access denied: " + error));
-  });
+  // Try to get the back camera explicitly
+  navigator.mediaDevices.enumerateDevices()
+    .then(devices => {
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      const backCamera = videoDevices.find(device => device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('rear'));
+
+      const constraints = backCamera
+        ? { video: { deviceId: { exact: backCamera.deviceId } } }
+        : { video: { facingMode: "environment" } };
+
+      return navigator.mediaDevices.getUserMedia(constraints);
+    })
+    .then(stream => {
+      video.srcObject = stream;
+    })
+    .catch(err => {
+      console.warn("Back camera failed, using front:", err);
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => { video.srcObject = stream; })
+        .catch(error => alert("Camera access denied: " + error));
+    });
 
   function startScan() {
     result.innerHTML = "👀 Scanning plate...";
@@ -29,3 +53,6 @@
     }, 3000);
   }
 </script>
+
+</body>
+</html>

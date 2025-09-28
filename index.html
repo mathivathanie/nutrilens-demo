@@ -1,58 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>NutriLens Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; background: #f8f8f8; }
-    video { width: 90%; max-width: 400px; margin-top: 20px; border-radius: 12px; }
-    #result { margin-top: 20px; font-size: 18px; font-weight: bold; }
-    button { padding: 10px 20px; margin-top: 15px; font-size: 16px; border-radius: 8px; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    video {
+      width: 90%;
+      max-width: 400px;
+      margin-top: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 15px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
   </style>
 </head>
 <body>
   <h1>🍽 NutriLens</h1>
-  <video id="video" autoplay></video><br>
+  <video id="video" autoplay playsinline></video><br>
   <button onclick="startScan()">Start Scan</button>
   <div id="result"></div>
 
   <script>
-  const video = document.getElementById('video');
-  const result = document.getElementById('result');
+    const video = document.getElementById('video');
+    const result = document.getElementById('result');
 
-  // Try to get the back camera explicitly
-  navigator.mediaDevices.enumerateDevices()
-    .then(devices => {
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      const backCamera = videoDevices.find(device => device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('rear'));
-
-      const constraints = backCamera
-        ? { video: { deviceId: { exact: backCamera.deviceId } } }
-        : { video: { facingMode: "environment" } };
-
-      return navigator.mediaDevices.getUserMedia(constraints);
+    // Request camera access with preference for back camera
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: "environment" } }
     })
     .then(stream => {
       video.srcObject = stream;
     })
     .catch(err => {
-      console.warn("Back camera failed, using front:", err);
+      console.warn("Back camera failed, trying fallback:", err);
       navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => { video.srcObject = stream; })
         .catch(error => alert("Camera access denied: " + error));
     });
 
-  function startScan() {
-    result.innerHTML = "👀 Scanning plate...";
-    setTimeout(() => {
-      result.innerHTML = `
-        ✅ Detected: Dosa, Chutney, Sambar <br>
-        🔥 Calories: 263 kcal <br>
-        💪 Protein: 6 g <br>
-        🥗 Tip: Great choice! Keep going!
-      `;
-    }, 3000);
-  }
-</script>
-
+    function startScan() {
+      result.innerHTML = "👀 Scanning plate...";
+      setTimeout(() => {
+        result.innerHTML = `
+          ✅ Detected: Dosa, Chutney, Sambar <br>
+          🔥 Calories: 263 kcal <br>
+          💪 Protein: 6 g <br>
+          🥗 Tip: Great choice! Keep going!
+        `;
+      }, 3000);
+    }
+  </script>
 </body>
 </html>

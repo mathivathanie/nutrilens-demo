@@ -19,22 +19,26 @@
     const video = document.getElementById('video');
     const result = document.getElementById('result');
 
-    // Open camera
-    navigator.mediaDevices.getUserMedia({ video: true })
+    // Open back camera first
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
       .then(stream => { video.srcObject = stream; })
-      .catch(err => { alert("Camera access denied: " + err); });
+      .catch(err => {
+        console.warn("Back camera not available, switching to front.");
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(stream => { video.srcObject = stream; })
+          .catch(error => alert("Camera access denied: " + error));
+      });
 
     function startScan() {
       result.innerHTML = "👀 Scanning plate...";
       setTimeout(() => {
-        // Mock detection output
         result.innerHTML = `
           ✅ Detected: Dosa, Chutney, Sambar <br>
           🔥 Calories: 263 kcal <br>
           💪 Protein: 6 g <br>
           🥗 Tip: Great choice! Keep going!
         `;
-      }, 3000); // 3 second gaze
+      }, 3000);
     }
   </script>
 </body>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NutriLens Prototype</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f8f8f8; }
+    video { width: 90%; max-width: 400px; margin-top: 20px; border-radius: 12px; }
+    #result { margin-top: 20px; font-size: 18px; font-weight: bold; }
+    button { padding: 10px 20px; margin-top: 15px; font-size: 16px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>🍽 NutriLens</h1>
+  <video id="video" autoplay></video><br>
+  <button onclick="startScan()">Start Scan</button>
+  <div id="result"></div>
+
+  <script>
+    const video = document.getElementById('video');
+    const result = document.getElementById('result');
+
+    // Open camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; })
+      .catch(err => { alert("Camera access denied: " + err); });
+
+    function startScan() {
+      result.innerHTML = "👀 Scanning plate...";
+      setTimeout(() => {
+        // Mock detection output
+        result.innerHTML = `
+          ✅ Detected: Dosa, Chutney, Sambar <br>
+          🔥 Calories: 263 kcal <br>
+          💪 Protein: 6 g <br>
+          🥗 Tip: Great choice! Keep going!
+        `;
+      }, 3000); // 3 second gaze
+    }
+  </script>
+</body>
+</html>
